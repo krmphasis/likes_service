@@ -1,33 +1,35 @@
-// models/post.js
+const { Sequelize, DataTypes } = require('sequelize');
 
-const { Pool } = require('pg');
+// const sequelize = new Sequelize('likes', 'postgres', 'password', {
+//   dialect: 'postgres',
+//   host: 'localhost',
+// });
 
-const pool = new Pool({
-  connectionString: 'postgresql://user:password@localhost/mydatabase',
+//fetch the connection string from developement.json
+const config = require('../config/development.json');
+const sequelize = new Sequelize('likes', 'postgres', 'Test@12345', {
+  host: 'localhost',
+  dialect: 'postgres',
+  logging: false,
 });
 
-class Post {
-  static async find() {
-    const client = await pool.connect();
-    try {
-      const result = await client.query('SELECT * FROM posts');
-      const posts = result.rows;
-      return posts;
-    } finally {
-      client.release();
-    }
-  }
-
-  static async findById(id) {
-    const client = await pool.connect();
-    try {
-      const result = await client.query('SELECT * FROM posts WHERE id = $1', [id]);
-      const post = result.rows[0];
-      return post;
-    } finally {
-      client.release();
-    }
-  }
-}
+const Post = sequelize.define('Post', {
+  title: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  author: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  content: {
+    type: DataTypes.TEXT,
+    allowNull: false,
+  },
+  likes: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+  },
+});
 
 module.exports = Post;
